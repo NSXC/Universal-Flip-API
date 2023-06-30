@@ -47,9 +47,9 @@ fn main() {
     println!("Client seed: {}", client_seed);
     let result = coinflip(&server_seed, &client_seed);
     if result > 0.5{
-       //handle user1
+        //Handle User 1
     }else if result < 0.5{
-        //handle user2
+        //Handle User 2
     }else{
         println!("Error In Results")
     }
