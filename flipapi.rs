@@ -31,8 +31,7 @@ fn coinflip(server_seed: &str, client_seed: &str) -> f64 {
         panic!("Numerator exceeds maximum value of u128.");
     }
     let result = numerator as f64 / denominator as f64;
-    let rounded_result = (result * 2.0).round() / 2.0; //prevent #5 errors (users will never tie) [my little hack]
-    rounded_result
+    result
 }
 
 fn main() {
