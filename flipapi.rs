@@ -4,7 +4,11 @@ use std::convert::TryInto;
 use rand::{RngCore};
 use rand::rngs::OsRng;
 use rand::Rng;
+use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
 
+use serde_json::json;
+use chrono::Utc;
 fn generate_server_seed() -> String {
     let timestamp = chrono::Utc::now().timestamp_nanos();
     format!("{:?}", timestamp)
@@ -26,7 +30,7 @@ fn coinflip(server_seed: &str, client_seed: &str) -> f64 {
     let mut hmac = Hmac::<Sha256>::new_varkey(server_seed.as_bytes()).expect("HMAC error");
     hmac.update(client_seed.as_bytes());
     let hash = hmac.finalize().into_bytes();
-    let numerator: u128 = u128::from_be_bytes(hash[..16].try_into().unwrap());
+    let numerator: u128 = u128::from_be_bytes(hash[..16].try_into().unwrap());//why use salona when we can use random byte arrays and memory instead
     let denominator: u128 = u128::MAX;
     if numerator > denominator {
         panic!("Numerator exceeds maximum value of u128.");
@@ -35,23 +39,19 @@ fn coinflip(server_seed: &str, client_seed: &str) -> f64 {
     if result == 0.5{
         let mut rng = rand::thread_rng();
         let random_number: f64 = rng.gen();
-        result = if random_number < 0.5 { 0.6 } else { 0.4 };
+        result = if random_number < 0.5 { 0.6 } else { 0.4 };//in the very case seed is 5 this is the tie brake its light random so 99% rnd
     }
     result
 }
 
 fn main() {
     let server_seed = generate_server_seed();
-    println!("Server seed: {}", server_seed);
     let client_seed = generate_client_seed();
-    println!("Client seed: {}", client_seed);
-    let result = coinflip(&server_seed, &client_seed);
-    if result > 0.5{
-        //Handle User 1
-    }else if result < 0.5{
-        //Handle User 2
-    }else{
-        println!("Error In Results")
-    }
-    println!("{}", result);
+    let result: f64 = coinflip(&server_seed, &client_seed);
+    let mut flipinfo = json!({
+        "Server_Seed": server_seed.to_string(),
+        "Client_Seed": client_seed,
+        "Result": result.to_string(),
+    });
+    println!("{}", flipinfo);
 }
