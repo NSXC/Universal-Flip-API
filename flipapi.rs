@@ -27,19 +27,19 @@ fn generate_client_seed() -> String {
 }
 
 fn coinflip(server_seed: &str, client_seed: &str) -> f64 {
-    let mut hmac = Hmac::<Sha256>::new_varkey(server_seed.as_bytes()).expect("HMAC error");
+    let mut hmac: Hmac<Sha256> = Hmac::<Sha256>::new_varkey(server_seed.as_bytes()).expect("HMAC error");
     hmac.update(client_seed.as_bytes());
-    let hash = hmac.finalize().into_bytes();
-    let numerator: u128 = u128::from_be_bytes(hash[..16].try_into().unwrap());//why use salona when we can use random byte arrays and memory instead
+    let hash: hmac::digest::generic_array::GenericArray<u8, hmac::digest::generic_array::typenum::UInt<hmac::digest::generic_array::typenum::UInt<hmac::digest::generic_array::typenum::UInt<hmac::digest::generic_array::typenum::UInt<hmac::digest::generic_array::typenum::UInt<hmac::digest::generic_array::typenum::UInt<hmac::digest::generic_array::typenum::UTerm, hmac::digest::consts::B1>, hmac::digest::consts::B0>, hmac::digest::consts::B0>, hmac::digest::consts::B0>, hmac::digest::consts::B0>, hmac::digest::consts::B0>> = hmac.finalize().into_bytes();
+    let numerator: u128 = u128::from_be_bytes(hash[..16].try_into().unwrap());
     let denominator: u128 = u128::MAX;
     if numerator > denominator {
         panic!("Numerator exceeds maximum value of u128.");
     }
     let mut result = numerator as f64 / denominator as f64;
-    if result == 0.5{
+    if result == 0.5 {
         let mut rng = rand::thread_rng();
         let random_number: f64 = rng.gen();
-        result = if random_number < 0.5 { 0.6 } else { 0.4 };//in the very case seed is 5 this is the tie brake its light random so 99% rnd
+        result = if random_number < 0.5 { 0.6 } else { 0.4 };
     }
     result
 }
