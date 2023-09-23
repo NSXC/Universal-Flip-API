@@ -20,7 +20,7 @@ fn generate_client_seed() -> String {
     rng.fill_bytes(&mut buffer);
     let client_seed: String = buffer
         .iter()
-        .map(|byte| format!("{:02x}", byte))
+        .map(|byte: &u8| format!("{:02x}", byte))
         .collect();
 
     client_seed
@@ -43,7 +43,6 @@ fn coinflip(server_seed: &str, client_seed: &str) -> f64 {
     }
     result
 }
-
 fn main() {
     let server_seed = generate_server_seed();
     let client_seed = generate_client_seed();
